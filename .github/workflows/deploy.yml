@@ -20,7 +20,7 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --registry=https://registry.npmmirror.com
 
       - name: Build static files
         run: yarn hexo generate
