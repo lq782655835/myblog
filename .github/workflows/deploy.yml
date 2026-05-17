@@ -1,0 +1,36 @@
+name: Deploy Blog to ECS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build static files
+        run: yarn hexo generate
+
+      - name: Deploy to ECS via rsync
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --delete
+          path: public/
+          remote_path: /var/www/myblog/
+          remote_host: ${{ secrets.ECS_HOST }}
+          remote_user: ${{ secrets.ECS_USER }}
+          remote_key: ${{ secrets.ECS_SSH_KEY }}
